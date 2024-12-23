@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <title>Heater Control Dashboard</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center">Heater Control Dashboard</h1>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Heater Control</h5>
+                        <button type="button" id="startheater" class="btn btn-success">Start</button>
+                        <button type="button" id="stopheater" class="btn btn-danger">Stop</button>
+                        <button type="button" id="primepump" class="btn btn-primary">Prime Pump</button>
+                        <div id="heaterStatus" class="status mt-3">Checking heater status...</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Heater Level</h5>
+                        <div class="slider-container">
+                            <input type="range" id="heaterSlider" min="0" max="100" value="0" class="form-control-range">
+                            <span id="sliderValue">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Heater Temperature</h5>
+                        <span id="heaterTemp">--</span> °C
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Room Temperature</h5>
+                        <span id="roomTemp">--</span> °C
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="card schedule-card">
+            <div class="card-body text-center">
+                <h5 class="card-title">Schedule Temperature (WIP)</h5>
+                <div class="days-of-week">
+                    <button type="button" class="btn btn-primary day-button" data-day="monday">Monday</button>
+                    <button type="button" class="btn btn-primary day-button" data-day="tuesday">Tuesday</button>
+                    <button type="button" class="btn btn-primary day-button" data-day="wednesday">Wednesday</button>
+                    <button type="button" class="btn btn-primary day-button" data-day="thursday">Thursday</button>
+                    <button type="button" class="btn btn-primary day-button" data-day="friday">Friday</button>
+                    <button type="button" class="btn btn-primary day-button" data-day="saturday">Saturday</button>
+                    <button type="button" class="btn btn-primary day-button" data-day="sunday">Sunday</button>
+                </div>
+                <div id="monday" class="hours-container">
+                    <h6>Monday Hours</h6>
+                    <div class="hour">
+                        <span>9:00 AM - 10:00 AM</span>
+                        <input type="number" class="temperature-input" min="0" max="40" value="20"> °C
+                    </div>
+                    <div class="hour">
+                        <span>10:00 AM - 11:00 AM</span>
+                        <input type="number" class="temperature-input" min="0" max="40" value="20"> °C
+                    </div>
+                    <!-- Add more hours as needed -->
+                </div>
+                <div id="tuesday" class="hours-container">
+                    <h6>Tuesday Hours</h6>
+                    <div class="hour">
+                        <span>9:00 AM - 10:00 AM</span>
+                        <input type="number" class="temperature-input" min="0" max="40" value="20"> °C
+                    </div>
+                    <div class="hour">
+                        <span>10:00 AM - 11:00 AM</span>
+                        <input type="number" class="temperature-input" min="0" max="40" value="20"> °C
+                    </div>
+    </div>
+    <script>
+        $(function () {
+            let heaterStarting = false;
+
+            function makeAjaxRequest(url, data, callback) {
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: JSON.stringify(data),
+                    contentType: "application/json",
+                    success: function(response) {
+                        console.log("Response:", response);
+                        if (callback) {
+                            callback(response);
+                        }
+                    },
+                    error: function(error) {
+                        console.error("Error:", error);
+                    }
+                });
+            }
+
+            function checkHeaterStatus() {
+                if (heaterStarting) {
+                    return;
+                }
+                $.ajax({
+                    type: "GET",
+                    url: "http://{{ server_ip }}:8000/state/",
+                    success: function(response) {
+                        console.log("Heater status:", response);
+                        if (response.message === "heater is on.") {
+                            $('#heaterStatus').css('color', 'green').text('Heater is on.');
+                        } else {
+                            $('#heaterStatus').css('color', 'red').text('Heater is off.');
+                        }
+                        // Update room and heater temperatures
+                        $('#roomTemp').text('Room Temperature: ' + response.room_temp);
+                        $('#heaterTemp').text('Heater Temperature: ' + response.heater_temp);
+                    },
+                    error: function(error) {
+                        console.error("Error:", error);
+                        $('#heaterStatus').css('color', 'red').text('Unable to get Heater status. check API is active');
+                    }
+                })};
+
+            $('#heaterSlider').on('input', function() {
+                var value = $(this).val();
+                $('#sliderValue').text(value);
+                makeAjaxRequest('http://{{ server_ip }}:8000/heater/speed', { speed: value });
+            });
+
+            $('#startheater').click(function() {
+                heaterStarting = true;
+                $('#heaterStatus').css('color', 'orange').text('Heater starting...');
+                makeAjaxRequest('http://{{ server_ip }}:8000/heater/on', {}, function(response) {
+                    console.log("Heater started:", response);
+                    heaterStarting = false;
+                    checkHeaterStatus();
+                });
+            });
+
+            $('#stopheater').click(function() {
+                makeAjaxRequest('http://{{ server_ip }}:8000/heater/off', {}, checkHeaterStatus);
+            });
+
+            // Poll the heater status every 5 seconds
+            setInterval(checkHeaterStatus, 5000);
+
+            // Initial check
+            checkHeaterStatus();
+        });
+    </script>
+</body>
+</html>

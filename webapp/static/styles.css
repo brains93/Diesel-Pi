@@ -1,0 +1,29 @@
+body {
+    padding: 20px;
+    background-color: #4c3c31; /* Orangey brown background */
+    color: #FFA500; /* Orange text */
+}
+.status {
+    font-weight: bold;
+    margin-top: 20px;
+}
+.temperature {
+    margin-top: 20px;
+}
+.temperature h3 {
+    margin-bottom: 10px;
+}
+.temperature span {
+    font-size: 1.5em;
+}
+.card {
+    margin-top: 20px;
+    background-color: #73381d; /* Darker orangey brown for cards */
+    color: #FFA500; /* Orange text */
+}
+.slider-container {
+    margin-top: 20px;
+}
+.btn {
+    color: #FFFFFF; /* White text for buttons */
+}
