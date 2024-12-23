@@ -12,8 +12,8 @@ Diesel Pi is a project designed to control a Diesel heater system using a Raspbe
   Your browser does not support the video tag.
 </video>
 
-### 
-- Hardwear video TODO
+### Hardware
+-  video TODO
 
 ## TODO
 - Add the ability to set a target room temp 
