@@ -22,13 +22,6 @@ Diesel Pi is a project designed to control a Diesel heater system using a Raspbe
 - Make the UI actually nice to look at (may need help here)
 
 
-## Video Tutorial
-
-Here is a video tutorial on how to set up Diesel Pi:
-
-
-
-
 ## Getting Started
 
 #### Software
