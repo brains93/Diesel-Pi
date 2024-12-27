@@ -19,6 +19,7 @@ Diesel Pi is a project designed to control a Diesel heater system using a Raspbe
 - Add the ability to set a target room temp 
 - Add the ability to set a schedule to keep the room at set temps during set times
 - Add a low fuel warning
+- Add altitude sensor and High altitude function where fan and pump speed are adjusted per percentage on every 1k feet of altitude (need exact ratio)
 - Make the UI actually nice to look at (may need help here)
 
 
