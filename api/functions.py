@@ -127,6 +127,13 @@ class HeaterControl:
     def pump(self):
         try:
             while not self.stop_event.is_set():
+                # Check heater temperature
+                heater_temp = self.sensor1.get_temperature()
+                if heater_temp > 115:
+                    self.stop_event.set()
+                    logging.warning("Heater temperature too high. Stopping pump.")
+                    break
+
                 logging.debug(self.stop_event)
                 try:
                     speed = self.value_queue.get(timeout=0.1)
